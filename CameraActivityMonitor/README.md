@@ -42,8 +42,9 @@
 欢迎提交 Issue 和 Pull Request 来帮助完善此项目！
 
 ## 致谢
-本项目使用了以下第三方库：
-- [CsWin32](https://github.com/microsoft/CsWin32) - 用于生成 Windows API 的 C# 绑定。
+- 插件图标由 [<img src="https://github.com/LiPolymer.png" width="20" height="20"/>](https://github.com/LiPolymer)[@LiPolymer](https://github.com/LiPolymer) 提供 [#1](https://github.com/LiuYan-xwx/CameraActivityMonitor/pull/1) 😋😋
+- 本项目使用了以下第三方库：
+  - [CsWin32](https://github.com/microsoft/CsWin32) - 用于生成 Windows API 的 C# 绑定。
 
 ## 📄 许可证 (License)
 
