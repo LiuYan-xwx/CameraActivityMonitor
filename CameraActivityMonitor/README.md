@@ -1,20 +1,20 @@
 # CameraActivityMonitor
 ## 摄像头状态监控
 
-这是一个为 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 编写的插件。
-本插件主要用于监控系统中摄像头的使用状态（是否正在推流），并在摄像头被占用或关闭时提供状态反馈，允许通过 ClassIsland 规则与其他功能进行联动。
+这是一个 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 插件。
+本插件主要用于监控系统中摄像头的使用状态，提供了一个规则用于指示。
 
 ## ✨ 主要功能
 
-- **实时摄像头状态监控**：底层调用 Windows 原生 Media Foundation 接口 (`IMFSensorActivityMonitor`) 实时监听，低功耗、无延迟。
-- **提供触发规则**：新增了 `摄像头是否使用` (`cameraactivitymonitor.iscamerainuse`) 规则条件。您可以利用该条件，在摄像头被其他软件（如相机）调用时，触发特定的 ClassIsland 操作或面板变化。
+- **实时摄像头状态监控**：非轮询调用检测，是利用 Windows 原生 Media Foundation 接口 (`IMFSensorActivityMonitor`) 的Callback 实时监听，低功耗、无延迟。
+- **提供触发规则**：新增了 `摄像头是否被使用`  规则。您可以利用该条件，在摄像头被其他软件（如相机）调用时，触发特定的 ClassIsland 操作或面板变化。
 - **指定设备监控**：支持选择摄像头设备，可在设置中选择需要监控的特定摄像头。
 - **自动启动**：支持跟随 ClassIsland 自动在后台开启监控逻辑。
 
 
 ## 🛠️ 系统要求
 
-- Windows 10 1703 及以上
+- **Windows 10 1703 及以上**
 
 ## ⚙️ 插件设置
 
@@ -35,7 +35,10 @@
 ## 🧩 规则用法
 
 安装本插件后，在 ClassIsland 任何支持“规则”的地方添加新条件：
-- 选择 **摄像头是否使用**：当选定监控的摄像头正在被调用（推流）时，该规则即为生效状态。
+- 选择 **摄像头是否被使用**：当选定监控的摄像头正在被调用（推流）时，该规则即为生效状态。
+### 使用示例
+- 对于一个文本组件，配置在 非 `摄像头是否被使用` 时隐藏，可以实现指示摄像头状态的文字。
+- 对于自动化提醒，可以设置 `规则集更新时` 触发器，并且选中 `摄像头是否使用` ，然后配置提醒或其它操作。
 
 ## 🤝 参与贡献 (Contributing)
 
