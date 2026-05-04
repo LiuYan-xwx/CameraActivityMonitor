@@ -1,4 +1,9 @@
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/LiuYan-xwx/CameraActivityMonitor/refs/heads/master/CameraActivityMonitor/icon.png" alt="Plugin Icon" height="100">
+
 # CameraActivityMonitor
+</div>
 
 一个用于监控摄像头占用状态的 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 插件。
 
