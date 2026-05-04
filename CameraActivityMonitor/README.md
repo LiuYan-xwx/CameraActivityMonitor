@@ -1,54 +1,71 @@
 # CameraActivityMonitor
-## 摄像头状态监控
 
-这是一个 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 插件。
-本插件主要用于监控系统中摄像头的使用状态，提供了一个规则用于指示。
+一个用于监控摄像头占用状态的 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 插件。
 
-## ✨ 主要功能
+它不会读取摄像头画面，也不会尝试控制摄像头，只是通过 Windows 的 Media Foundation 接口监听摄像头当前是否正在被其它程序使用，并把这个状态提供给 ClassIsland 的规则系统。
 
-- **实时摄像头状态监控**：非轮询调用检测，是利用 Windows 原生 Media Foundation 接口 (`IMFSensorActivityMonitor`) 的Callback 实时监听，低功耗、无延迟。
-- **提供触发规则**：新增了 `摄像头是否被使用`  规则。您可以利用该条件，在摄像头被其他软件（如相机）调用时，触发特定的 ClassIsland 操作或面板变化。
-- **指定设备监控**：支持选择摄像头设备，可在设置中选择需要监控的特定摄像头。
-- **自动启动**：支持跟随 ClassIsland 自动在后台开启监控逻辑。
+## 功能
 
+- 监控指定摄像头是否正在被占用
+- 在 ClassIsland 中提供 `摄像头是否被使用` 规则
+- 支持在设置页选择要监控的摄像头设备
+- 支持跟随 ClassIsland 启动后自动开始监控
 
-## 🛠️ 系统要求
+## 使用方法
 
-- **Windows 10 1703 及以上**
+安装插件后，打开 ClassIsland 的应用设置，进入 **CameraActivityMonitor** 设置页。
 
-## ⚙️ 插件设置
+在这里可以：
 
-在 ClassIsland 的【应用设置】 -> 找到 **CameraActivityMonitor**，可以进行以下配置：
+1. 选择需要监控的摄像头。
+2. 点击“开启”开始监控，点击“关闭”停止监控。
+3. 如有需要，可以点击“刷新”重新读取摄像头列表。
+4. 打开“自动开启监控”后，ClassIsland 下次启动时会自动开始监控已选择的摄像头。
 
-1. **监控的摄像头设备**：在列表中选择想要监控的摄像头。
-2. **自动启动监控**：勾选后，ClassIsland 每次启动时都会自动监听所选设备。
+## 规则用法
 
-## 📖 使用方法
+插件会注册一个规则：
 
-1. 安装插件。
-2. 打开插件设置页：`CameraActivityMonitor`
-3. 在“选择摄像头”中选择要监控的设备
-4. 点击“开启”开始监控（可随时“关闭”）
-5. 可打开“自动开启监控”开关：
-   - 开启后，应用启动时若已保存 `SelectedCamera`，会自动开始监控
+```
+摄像头是否被使用
+```
 
-## 🧩 规则用法
+当当前选中的摄像头正在被其它程序调用时，这个规则会处于生效状态。
 
-安装本插件后，在 ClassIsland 任何支持“规则”的地方添加新条件：
-- 选择 **摄像头是否被使用**：当选定监控的摄像头正在被调用（推流）时，该规则即为生效状态。
 ### 使用示例
-- 对于一个文本组件，配置在 非 `摄像头是否被使用` 时隐藏，可以实现指示摄像头状态的文字。
-- 对于自动化提醒，可以设置 `规则集更新时` 触发器，并且选中 `摄像头是否使用` ，然后配置提醒或其它操作。
 
-## 🤝 参与贡献 (Contributing)
+* 使用文本组件，在 非 `摄像头是否被使用` 时隐藏，实现被使用的提示文字
+* 配合自动化功能，在摄像头状态变化时触发提醒或其它操作。
 
-欢迎提交 Issue 和 Pull Request 来帮助完善此项目！
+## 注意事项
+
+* 本插件依赖 Windows 的 Media Foundation 摄像头活动监控接口，因此只支持 Windows。
+* 插件只判断摄像头是否被占用，不会读取、保存或上传摄像头画面。
+* 当前规则只暴露“是否正在使用”的状态，不显示正在使用摄像头的具体进程。(之后有时间会更新)
+* 如果摄像头列表为空，可以先确认系统里能否正常识别摄像头，然后回到设置页点击“刷新”。
+
+## 系统要求
+
+* **Windows 10 1703 及以上**
+* ClassIsland 2.0+
+
+## 开发与构建
+
+项目基于 .NET 8 和 ClassIsland Plugin SDK。
+
+本地构建插件包可以运行：
+
+```powershell
+./tools/publish.ps1
+```
+
+脚本会执行 Release 发布，并启用 `CreateCipx` 生成插件包。
 
 ## 致谢
-- 插件图标由 [<img src="https://github.com/LiPolymer.png" width="20" height="20"/>](https://github.com/LiPolymer)[@LiPolymer](https://github.com/LiPolymer) 提供 [#1](https://github.com/LiuYan-xwx/CameraActivityMonitor/pull/1) 😋😋
-- 本项目使用了以下第三方库：
-  - [CsWin32](https://github.com/microsoft/CsWin32) - 用于生成 Windows API 的 C# 绑定。
 
-## 📄 许可证 (License)
+* 插件图标由 [@LiPolymer](https://github.com/LiPolymer) 提供：[#1](https://github.com/LiuYan-xwx/CameraActivityMonitor/pull/1) 😋😋
+* 本项目使用 [CsWin32](https://github.com/microsoft/CsWin32) 生成 Windows API 的 C# 绑定
 
-本项目采用 [AGPLv3](https://github.com/LiuYan-xwx/CameraActivityMonitor/blob/master/LICENSE.txt) 许可证。
+## 许可证
+
+本项目使用 [AGPLv3](https://github.com/LiuYan-xwx/CameraActivityMonitor/blob/master/LICENSE.txt) 许可证。
