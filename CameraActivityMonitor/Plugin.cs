@@ -36,7 +36,7 @@ namespace CameraActivityMonitor
             services.AddSingleton<ICameraActivityMonitorService, CameraActivityMonitorService>();
             services.AddSettingsPage<CameraActivityMonitorSettingsPage>();
             services.AddSingleton<SettingsPageViewModel>();
-            services.AddRule("cameraactivitymonitor.iscamerainuse", "摄像头是否被使用");
+            services.AddRule("cameraactivitymonitor.iscamerainuse", "摄像头是否被使用", "\uE392");
 
             AppBase.Current.AppStarted += (_, _) => StartCameraMonitoringIfNeeded();
 
