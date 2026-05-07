@@ -4,7 +4,7 @@ namespace CameraActivityMonitor.Converters
 {
     public class BooleanToIsUseStatusConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
         {
             if (value is bool b)
             {
@@ -12,7 +12,7 @@ namespace CameraActivityMonitor.Converters
             }
             return "未知";
         }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
         }
