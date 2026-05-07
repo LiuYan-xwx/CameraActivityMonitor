@@ -16,6 +16,9 @@
 - 支持在设置页选择要监控的摄像头设备
 - 支持跟随 ClassIsland 启动后自动开始监控
 
+## 设置截图
+<img width="1552" height="726" alt="image" src="https://github.com/user-attachments/assets/9436026b-37f9-4a82-8c73-317507f9eb8e" />
+
 ## 使用方法
 
 安装插件后，打开 ClassIsland 的应用设置，进入 **CameraActivityMonitor** 设置页。
