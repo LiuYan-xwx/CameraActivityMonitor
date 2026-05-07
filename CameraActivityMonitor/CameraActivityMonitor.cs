@@ -32,8 +32,6 @@ public sealed class CameraActivityMonitor : IDisposable
         if (_started)
             return;
 
-        PInvoke.MFStartup(PInvoke.MF_VERSION, 0);
-
         PInvoke.MFCreateSensorActivityMonitor(_callback, out _monitor);
 
         _monitor.Start();
