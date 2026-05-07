@@ -2,6 +2,7 @@
 using CameraActivityMonitor.Helpers;
 using CameraActivityMonitor.Models;
 using ClassIsland.Core.Abstractions.Services;
+using System.Diagnostics;
 
 namespace CameraActivityMonitor.Services
 {
@@ -10,6 +11,8 @@ namespace CameraActivityMonitor.Services
         public bool IsCameraInUse { get; private set; }
         public bool IsMonitoring => _monitor is not null;
         public string? CurrentCameraId { get; private set; }
+
+        public string? ProcessName { get; private set; }
 
         public event Action<bool>? UsageChanged;
 
@@ -61,11 +64,13 @@ namespace CameraActivityMonitor.Services
 
             CurrentCameraId = null;
             IsCameraInUse = false;
+            ProcessName = null;
         }
 
         private void OnUsageChanged(bool inUse, uint? pid)
         {
             IsCameraInUse = inUse;
+            ProcessName = pid.HasValue ? Process.GetProcessById((int)pid).ProcessName : null;
             UsageChanged?.Invoke(inUse);
             Dispatcher.UIThread.Post(() => _rulesetService.NotifyStatusChanged());
         }

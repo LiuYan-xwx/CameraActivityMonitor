@@ -8,6 +8,8 @@ public interface ICameraActivityMonitorService : IDisposable
     public bool IsMonitoring { get; }
     public string? CurrentCameraId { get; }
 
+    public string? ProcessName { get; }
+
     Task<IReadOnlyList<CameraDeviceInfo>> GetAllCamerasAsync();
 
     public event Action<bool>? UsageChanged;
