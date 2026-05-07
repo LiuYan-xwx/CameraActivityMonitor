@@ -12,19 +12,21 @@ namespace CameraActivityMonitor.ViewModels
         public bool IsMonitoring => _cameraActivityMonitorService.IsMonitoring;
         public ObservableCollection<CameraDeviceInfo> Cameras { get; } = [];
 
-        [ObservableProperty]
-        private bool _isLoading;
-
         public bool IsCameraInUse => _cameraActivityMonitorService.IsCameraInUse;
 
         public static Settings Settings => Plugin.Settings;
+
+        public bool CanStartMonitor => !IsMonitoring;
 
         public CameraDeviceInfo? SelectedCamera
         {
             get => Plugin.Settings.SelectedCamera;
             set
             {
-                if (SetProperty(Plugin.Settings.SelectedCamera, value, Plugin.Settings, (s, v) => s.SelectedCamera = v))
+                if (SetProperty(Plugin.Settings.SelectedCamera,
+                                value,
+                                Plugin.Settings,
+                                (s, v) => s.SelectedCamera = v))
                 {
                     OnSelectedCameraChanged(value);
                 }
@@ -63,8 +65,6 @@ namespace CameraActivityMonitor.ViewModels
         {
             try
             {
-                IsLoading = true;
-
                 var devices = await _cameraActivityMonitorService.GetAllCamerasAsync();
                 var previousId = SelectedCamera?.Id;
                 Cameras.Clear();
@@ -87,14 +87,9 @@ namespace CameraActivityMonitor.ViewModels
             {
                 _cameraActivityMonitorService.StopMonitoring();
             }
-            finally
-            {
-                IsLoading = false;
-            }
-            //StartMonitor();
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanStartMonitor))]
         private void StartMonitor()
         {
             if (IsMonitoring || SelectedCamera is null)
@@ -104,9 +99,12 @@ namespace CameraActivityMonitor.ViewModels
             _cameraActivityMonitorService.StartMonitoring(SelectedCamera.Id);
             OnPropertyChanged(nameof(IsMonitoring));
             OnPropertyChanged(nameof(IsCameraInUse));
+            OnPropertyChanged(nameof(CanStartMonitor));
+            StartMonitorCommand.NotifyCanExecuteChanged();
+            StopMonitorCommand.NotifyCanExecuteChanged();
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(IsMonitoring))]
         private void StopMonitor()
         {
             if (!IsMonitoring)
@@ -116,6 +114,9 @@ namespace CameraActivityMonitor.ViewModels
             _cameraActivityMonitorService.StopMonitoring();
             OnPropertyChanged(nameof(IsMonitoring));
             OnPropertyChanged(nameof(IsCameraInUse));
+            OnPropertyChanged(nameof(CanStartMonitor));
+            StartMonitorCommand.NotifyCanExecuteChanged();
+            StopMonitorCommand.NotifyCanExecuteChanged();
         }
     }
 }
