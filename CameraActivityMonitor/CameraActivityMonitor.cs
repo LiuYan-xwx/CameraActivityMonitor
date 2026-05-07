@@ -15,10 +15,10 @@ public sealed class CameraActivityMonitor : IDisposable
 
     public bool IsInUse => _callback.IsInUse;
 
-    public event Action<bool>? UsageChanged
+    public event Action<bool, uint?>? UsageChanged
     {
-        add => _callback.UsageChanged += (inUse, pids) => value?.Invoke(inUse);
-        remove => _callback.UsageChanged -= (inUse, pids) => value?.Invoke(inUse);
+        add => _callback.UsageChanged += value;
+        remove => _callback.UsageChanged -= value;
     }
 
     public CameraActivityMonitor(string deviceId)
@@ -60,10 +60,10 @@ public sealed class CameraActivityMonitor : IDisposable
 
         public bool IsInUse { get; private set; }
 
-        // bool: 是否占用, IReadOnlyCollection<uint>: 当前占用该设备的 PID 列表
-        public event Action<bool, IReadOnlyCollection<uint>>? UsageChanged;
+        // bool: 是否占用, uint?: 当前占用该设备的 PID（无占用时为 null）
+        public event Action<bool, uint?>? UsageChanged;
 
-        private HashSet<uint> _activePids = [];
+        private uint? _activePid;
 
         public SensorActivityCallback(string deviceId)
         {
@@ -72,7 +72,8 @@ public sealed class CameraActivityMonitor : IDisposable
 
         public void OnActivitiesReport(IMFSensorActivitiesReport sensorActivitiesReport)
         {
-            HashSet<uint> latestPids = [];
+            uint? latestPid = null;
+
             try
             {
                 sensorActivitiesReport.GetActivityReportByDeviceName(_deviceId, out var deviceActivityReport);
@@ -89,33 +90,32 @@ public sealed class CameraActivityMonitor : IDisposable
                     }
 
                     processActivity.GetProcessId(out uint processId);
-                    latestPids.Add(processId);
+                    latestPid = processId;
+                    break; // 同一时间只有一个 streaming=true
                 }
             }
             catch (COMException ex) when ((uint)ex.HResult == 0xC00D36D5)
             {
                 // 设备当前没有活动
-                latestPids.Clear();
+                latestPid = null;
             }
 
-            bool inUse = latestPids.Count > 0;
+            bool inUse = latestPid.HasValue;
             bool changed;
-            uint[] snapshot;
 
             lock (_gate)
             {
-                changed = (IsInUse != inUse) || !_activePids.SetEquals(latestPids);
+                changed = (IsInUse != inUse) || _activePid != latestPid;
                 if (!changed)
                 {
                     return;
                 }
 
                 IsInUse = inUse;
-                _activePids = latestPids;
-                snapshot = _activePids.ToArray();
+                _activePid = latestPid;
             }
 
-            UsageChanged?.Invoke(IsInUse, snapshot);
+            UsageChanged?.Invoke(IsInUse, _activePid);
         }
     }
 }

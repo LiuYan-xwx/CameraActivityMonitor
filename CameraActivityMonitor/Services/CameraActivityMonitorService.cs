@@ -63,7 +63,7 @@ namespace CameraActivityMonitor.Services
             IsCameraInUse = false;
         }
 
-        private void OnUsageChanged(bool inUse)
+        private void OnUsageChanged(bool inUse, uint? pid)
         {
             IsCameraInUse = inUse;
             UsageChanged?.Invoke(inUse);
