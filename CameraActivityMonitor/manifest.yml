@@ -3,7 +3,7 @@ name: CameraActivityMonitor
 description: 一个监控摄像头是否正在被使用的插件
 entranceAssembly: "CameraActivityMonitor.dll"
 url: https://github.com/LiuYan-xwx/CameraActivityMonitor
-version: 1.0.2.0
+version: 1.1.0.0
 apiVersion: 2.0.0.0
 author: 流焰xwx
 repoOwner: LiuYan-xwx
