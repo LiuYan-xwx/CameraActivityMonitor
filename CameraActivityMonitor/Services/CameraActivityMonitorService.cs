@@ -2,17 +2,19 @@
 using CameraActivityMonitor.Helpers;
 using CameraActivityMonitor.Models;
 using ClassIsland.Core.Abstractions.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Diagnostics;
 
 namespace CameraActivityMonitor.Services
 {
-    public class CameraActivityMonitorService : ICameraActivityMonitorService
+    public partial class CameraActivityMonitorService : ObservableObject, ICameraActivityMonitorService
     {
         public bool IsCameraInUse { get; private set; }
         public bool IsMonitoring => _monitor is not null;
         public string? CurrentCameraId { get; private set; }
 
-        public string? ProcessName { get; private set; }
+        [ObservableProperty]
+        private string? _processName;
 
         public event Action<bool>? UsageChanged;
 

@@ -34,6 +34,10 @@
                             <TextBlock Text="摄像头状态：" />
                             <TextBlock FontWeight="SemiBold" Text="{Binding IsCameraInUse, Converter={StaticResource BooleanToIsUseStatusConverter}}" />
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="进程名：" />
+                            <TextBlock FontWeight="SemiBold" Text="{Binding CameraActivityMonitorService.ProcessName}" />
+                        </StackPanel>
                     </StackPanel>
                 </controls:SettingsExpander.Header>
             </controls:SettingsExpander>

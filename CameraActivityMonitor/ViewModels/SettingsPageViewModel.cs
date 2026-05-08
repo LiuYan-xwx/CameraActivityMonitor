@@ -8,11 +8,11 @@ namespace CameraActivityMonitor.ViewModels
 {
     public partial class SettingsPageViewModel : ObservableObject
     {
-        private readonly ICameraActivityMonitorService _cameraActivityMonitorService;
-        public bool IsMonitoring => _cameraActivityMonitorService.IsMonitoring;
+        public ICameraActivityMonitorService CameraActivityMonitorService { get; }
+        public bool IsMonitoring => CameraActivityMonitorService.IsMonitoring;
         public ObservableCollection<CameraDeviceInfo> Cameras { get; } = [];
 
-        public bool IsCameraInUse => _cameraActivityMonitorService.IsCameraInUse;
+        public bool IsCameraInUse => CameraActivityMonitorService.IsCameraInUse;
 
         public static Settings Settings => Plugin.Settings;
 
@@ -36,8 +36,8 @@ namespace CameraActivityMonitor.ViewModels
 
         public SettingsPageViewModel(ICameraActivityMonitorService cameraActivityMonitorService)
         {
-            _cameraActivityMonitorService = cameraActivityMonitorService;
-            _cameraActivityMonitorService.UsageChanged += (_) => OnPropertyChanged(nameof(IsCameraInUse));
+            CameraActivityMonitorService = cameraActivityMonitorService;
+            CameraActivityMonitorService.UsageChanged += (_) => OnPropertyChanged(nameof(IsCameraInUse));
 
             if (Settings.AutoStart)
             {
@@ -65,7 +65,7 @@ namespace CameraActivityMonitor.ViewModels
         {
             try
             {
-                var devices = await _cameraActivityMonitorService.GetAllCamerasAsync();
+                var devices = await CameraActivityMonitorService.GetAllCamerasAsync();
                 var previousId = SelectedCamera?.Id;
                 Cameras.Clear();
 
@@ -77,7 +77,7 @@ namespace CameraActivityMonitor.ViewModels
                 if (Cameras.Count == 0)
                 {
                     SelectedCamera = null;
-                    _cameraActivityMonitorService.StopMonitoring();
+                    CameraActivityMonitorService.StopMonitoring();
                     return;
                 }
 
@@ -85,7 +85,7 @@ namespace CameraActivityMonitor.ViewModels
             }
             catch
             {
-                _cameraActivityMonitorService.StopMonitoring();
+                CameraActivityMonitorService.StopMonitoring();
             }
         }
 
@@ -96,7 +96,7 @@ namespace CameraActivityMonitor.ViewModels
             {
                 return;
             }
-            _cameraActivityMonitorService.StartMonitoring(SelectedCamera.Id);
+            CameraActivityMonitorService.StartMonitoring(SelectedCamera.Id);
             OnPropertyChanged(nameof(IsMonitoring));
             OnPropertyChanged(nameof(IsCameraInUse));
             OnPropertyChanged(nameof(CanStartMonitor));
@@ -111,7 +111,7 @@ namespace CameraActivityMonitor.ViewModels
             {
                 return;
             }
-            _cameraActivityMonitorService.StopMonitoring();
+            CameraActivityMonitorService.StopMonitoring();
             OnPropertyChanged(nameof(IsMonitoring));
             OnPropertyChanged(nameof(IsCameraInUse));
             OnPropertyChanged(nameof(CanStartMonitor));
