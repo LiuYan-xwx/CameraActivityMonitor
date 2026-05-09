@@ -24,7 +24,14 @@ namespace CameraActivityMonitor.Services
         public CameraActivityMonitorService(IRulesetService rulesetService)
         {
             _rulesetService = rulesetService;
-            _rulesetService.RegisterRuleHandler("cameraactivitymonitor.iscamerainuse", (_) => IsCameraInUse);
+            _rulesetService.RegisterRuleHandler("cameraactivitymonitor.iscamerainuse", (o) =>
+            {
+                if (o is CameraRuleSettings settings)
+                {
+                    return IsCameraInUse && (settings.MatchProcessName == false || string.Equals(ProcessName, settings.ProcessName, StringComparison.OrdinalIgnoreCase));
+                }
+                return false;
+            });
         }
 
         public async Task<IReadOnlyList<CameraDeviceInfo>> GetAllCamerasAsync()
