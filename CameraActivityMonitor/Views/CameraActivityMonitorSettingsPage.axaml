@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ci="http://classisland.tech/schemas/xaml/core"
     xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-    xmlns:converters="clr-namespace:CameraActivityMonitor.Converters"
+    xmlns:controls1="clr-namespace:CameraActivityMonitor.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:CameraActivityMonitor.ViewModels"
@@ -17,32 +17,38 @@
     </Design.DataContext>
 
     <ScrollViewer>
-        <ScrollViewer.Resources>
-            <converters:BooleanToStatusConverter x:Key="BooleanToStatusConverter" />
-            <converters:BooleanToIsUseStatusConverter x:Key="BooleanToIsUseStatusConverter" />
-        </ScrollViewer.Resources>
+        <StackPanel Classes="settings-container animated-intro" Spacing="8">
+            <ci:IconText Glyph="&#xE9E4;" Text="状态信息" />
+            <controls:SettingsExpander
+                Description="查看摄像头监控状态及占用情况"
+                Header="当前状态"
+                IconSource="{ci:FluentIconSource &#xE9E4;}"
+                IsExpanded="True">
 
-        <StackPanel Classes="settings-container animated-intro">
-            <controls:SettingsExpander>
-                <controls:SettingsExpander.Header>
-                    <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="当前状态：" />
-                            <TextBlock FontWeight="SemiBold" Text="{Binding IsMonitoring, Converter={StaticResource BooleanToStatusConverter}}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="摄像头状态：" />
-                            <TextBlock FontWeight="SemiBold" Text="{Binding IsCameraInUse, Converter={StaticResource BooleanToIsUseStatusConverter}}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="进程名：" />
-                            <TextBlock FontWeight="SemiBold" Text="{Binding CameraActivityMonitorService.ProcessName}" />
-                        </StackPanel>
-                    </StackPanel>
-                </controls:SettingsExpander.Header>
+                <controls:SettingsExpanderItem Content="监控状态">
+                    <controls:SettingsExpanderItem.Footer>
+                        <controls1:CheckOrDismiss FontSize="16" Status="{Binding IsMonitoring}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem Content="是否被占用">
+                    <controls:SettingsExpanderItem.Footer>
+                        <controls1:CheckOrDismiss FontSize="16" Status="{Binding IsCameraInUse}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem Content="占用进程名">
+                    <controls:SettingsExpanderItem.Footer>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding CameraActivityMonitorService.ProcessName}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
             </controls:SettingsExpander>
 
+            <Separator Margin="0,12,0,4" />
+            <ci:IconText Glyph="&#xEF27;" Text="控制及配置" />
+
             <controls:SettingsExpander
+                Description="选择要监控的目标摄像头"
                 Header="选择摄像头"
                 IconSource="{ci:FluentIconSource &#xE392;}"
                 IsExpanded="True">
@@ -52,37 +58,48 @@
                         ItemsSource="{Binding Cameras}"
                         SelectedItem="{Binding SelectedCamera, Mode=TwoWay}" />
                 </controls:SettingsExpander.Footer>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <ci:AnimatedIconButton
-                        Classes.fade="{Binding IsMonitoring}"
-                        Classes.foreground-accent="{Binding !IsMonitoring}"
-                        Command="{Binding StartMonitorCommand}"
-                        Glyph="&#xEDB9;"
-                        IsKeepingExpanded="{Binding !IsMonitoring}"
-                        Text="开启" />
-                    <ci:AnimatedIconButton
-                        Classes.fade="{Binding !IsMonitoring}"
-                        Classes.foreground-accent="{Binding IsMonitoring}"
-                        Command="{Binding StopMonitorCommand}"
-                        Glyph="&#xEE67;"
-                        IsKeepingExpanded="{Binding IsMonitoring}"
-                        Text="关闭" />
-                    <ci:AnimatedIconButton
-                        Classes.fade="{Binding RefreshCommand.IsRunning}"
-                        Classes.foreground-accent="{Binding !RefreshCommand.IsRunning}"
-                        Command="{Binding RefreshCommand}"
-                        Glyph="&#xE161;"
-                        IsKeepingExpanded="{Binding !RefreshCommand.IsRunning}"
-                        Text="刷新" />
-                    <controls:ProgressRing
-                        Width="16"
-                        Height="16"
-                        VerticalAlignment="Center"
-                        IsActive="{Binding RefreshCommand.IsRunning}" />
-                </StackPanel>
+
+                <controls:SettingsExpanderItem Content="操作">
+                    <controls:SettingsExpanderItem.Footer>
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <ci:AnimatedIconButton
+                                Classes.fade="{Binding IsMonitoring}"
+                                Classes.foreground-accent="{Binding !IsMonitoring}"
+                                Command="{Binding StartMonitorCommand}"
+                                Glyph="&#xEDB9;"
+                                IsKeepingExpanded="{Binding !IsMonitoring}"
+                                Text="开启" />
+                            <ci:AnimatedIconButton
+                                Classes.fade="{Binding !IsMonitoring}"
+                                Classes.foreground-accent="{Binding IsMonitoring}"
+                                Command="{Binding StopMonitorCommand}"
+                                Glyph="&#xEE67;"
+                                IsKeepingExpanded="{Binding IsMonitoring}"
+                                Text="关闭" />
+                            <ci:AnimatedIconButton
+                                Classes.fade="{Binding RefreshCommand.IsRunning}"
+                                Classes.foreground-accent="{Binding !RefreshCommand.IsRunning}"
+                                Command="{Binding RefreshCommand}"
+                                Glyph="&#xE161;"
+                                IsKeepingExpanded="{Binding !RefreshCommand.IsRunning}"
+                                Text="刷新" />
+                            <controls:ProgressRing
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center"
+                                IsActive="{Binding RefreshCommand.IsRunning}" />
+                        </StackPanel>
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
             </controls:SettingsExpander>
 
-            <controls:SettingsExpander Header="自动开启监控" IconSource="{ci:FluentIconSource &#xE342;}">
+            <controls:SettingsExpander
+                Description="程序启动后自动开始监控"
+                Header="自动开启监控"
+                IconSource="{ci:FluentIconSource &#xE342;}">
                 <controls:SettingsExpander.Footer>
                     <ToggleSwitch IsChecked="{Binding Settings.AutoStart, Mode=TwoWay}" />
                 </controls:SettingsExpander.Footer>
