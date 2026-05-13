@@ -15,7 +15,6 @@
     <Design.DataContext>
         <viewModels:SettingsPageViewModel />
     </Design.DataContext>
-
     <ScrollViewer>
         <StackPanel Classes="settings-container animated-intro" Spacing="8">
             <ci:IconText Glyph="&#xE9E4;" Text="状态信息" />
@@ -53,10 +52,24 @@
                 IconSource="{ci:FluentIconSource &#xE392;}"
                 IsExpanded="True">
                 <controls:SettingsExpander.Footer>
-                    <ComboBox
-                        Width="260"
-                        ItemsSource="{Binding Cameras}"
-                        SelectedItem="{Binding SelectedCamera, Mode=TwoWay}" />
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <ComboBox
+                            Width="260"
+                            ItemsSource="{Binding Cameras}"
+                            SelectedItem="{Binding SelectedCamera, Mode=TwoWay}" />
+                        <ci:AnimatedIconButton
+                            Classes.fade="{Binding OpenPreviewCommand.IsRunning}"
+                            Classes.foreground-accent="{Binding !OpenPreviewCommand.IsRunning}"
+                            Command="{Binding OpenPreviewCommand}"
+                            Glyph="&#xE392;"
+                            IsKeepingExpanded="{Binding !OpenPreviewCommand.IsRunning}"
+                            Text="预览" />
+                        <controls:ProgressRing
+                            Width="16"
+                            Height="16"
+                            VerticalAlignment="Center"
+                            IsActive="{Binding OpenPreviewCommand.IsRunning}" />
+                    </StackPanel>
                 </controls:SettingsExpander.Footer>
 
                 <controls:SettingsExpanderItem Content="操作">

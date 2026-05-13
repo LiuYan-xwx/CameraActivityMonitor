@@ -1,7 +1,12 @@
-﻿using CameraActivityMonitor.Models;
+﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
+using CameraActivityMonitor.Helpers;
+using CameraActivityMonitor.Models;
 using CameraActivityMonitor.Services;
+using ClassIsland.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentAvalonia.UI.Controls;
 using System.Collections.ObjectModel;
 
 namespace CameraActivityMonitor.ViewModels
@@ -117,6 +122,37 @@ namespace CameraActivityMonitor.ViewModels
             OnPropertyChanged(nameof(CanStartMonitor));
             StartMonitorCommand.NotifyCanExecuteChanged();
             StopMonitorCommand.NotifyCanExecuteChanged();
+        }
+
+        [RelayCommand]
+        private async Task OpenPreview()
+        {
+            if (SelectedCamera is null)
+            {
+                return;
+            }
+            int? index = await CameraDeviceHelper.TryGetCameraIndexByIdAsync(SelectedCamera.Id);
+            if (index == null)
+            {
+                return;
+            }
+            WriteableBitmap? cameraFrame = await Task.Run(() =>
+            {
+                return CameraHelper.CaptureFrameBitmap(index.Value);
+            });
+            TaskDialog taskDialog = new()
+            {
+                Content = new Image
+                {
+                    Source = cameraFrame,
+                    Stretch = Avalonia.Media.Stretch.Uniform
+                },
+                Title = "预览",
+                Buttons = { new TaskDialogButton("确定", null) },
+                XamlRoot = AppBase.Current.GetRootWindow(),
+            };
+            await taskDialog.ShowAsync();
+            cameraFrame?.Dispose();
         }
     }
 }
