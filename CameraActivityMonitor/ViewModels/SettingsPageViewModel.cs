@@ -92,7 +92,7 @@ namespace CameraActivityMonitor.ViewModels
         [RelayCommand(CanExecute = nameof(CanStartMonitor))]
         private void StartMonitor()
         {
-            if (IsMonitoring || SelectedCamera is null)
+            if (SelectedCamera is null)
             {
                 return;
             }
