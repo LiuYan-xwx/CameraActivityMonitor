@@ -33,7 +33,7 @@ jobs:
         with:
           path: |
             ./CameraActivityMonitor/cipx/*.cipx
-          name: CameraActivityMonitor-ActionsBuild
+          name: CameraActivityMonitor-${{ github.sha }}
       
       - name: Upload APP to release
         uses: ncipollo/release-action@v1
