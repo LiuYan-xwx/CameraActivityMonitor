@@ -3,6 +3,13 @@
 <img src="https://raw.githubusercontent.com/LiuYan-xwx/CameraActivityMonitor/refs/heads/master/CameraActivityMonitor/icon.png" alt="Plugin Icon" height="100">
 
 # CameraActivityMonitor
+
+
+![GitHub License](https://img.shields.io/github/license/LiuYan-xwx/CameraActivityMonitor)
+![GitHub top language](https://img.shields.io/github/languages/top/LiuYan-xwx/CameraActivityMonitor)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/LiuYan-xwx/CameraActivityMonitor/total?label=%E6%80%BB%E4%B8%8B%E8%BD%BD%E9%87%8F)
+![GitHub Repo stars](https://img.shields.io/github/stars/LiuYan-xwx/CameraActivityMonitor)
+
 </div>
 
 一个用于监控摄像头占用状态的 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 插件。
