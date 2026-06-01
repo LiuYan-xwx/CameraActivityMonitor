@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/LiuYan-xwx/CameraActivityMonitor/refs/heads/master/CameraActivityMonitor/icon.png" alt="Plugin Icon" height="100">
+<img src="https://raw.githubusercontent.com/LiuYan-xwx/CameraActivityMonitor/refs/heads/master/CameraActivityMonitor/icon.png" alt="Plugin Icon" width="100" height="100">
 
 # CameraActivityMonitor
 
@@ -25,7 +25,7 @@
 - 支持匹配占用的进程名
 
 ## 设置截图
-<img width="1552" height="726" alt="image" src="https://github.com/user-attachments/assets/9436026b-37f9-4a82-8c73-317507f9eb8e" />
+<img width="2047" height="1152" alt="image" src="https://github.com/user-attachments/assets/8770f2f8-fd0e-4002-851e-7b9e91f6b264" />
 
 ## 系统要求
 
