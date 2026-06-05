@@ -18,7 +18,7 @@ namespace CameraActivityMonitor.Services
 
         public event Action<bool>? UsageChanged;
 
-        private CameraActivityMonitor? _monitor;
+        private NativeCameraActivityMonitor? _monitor;
         private readonly IRulesetService _rulesetService;
 
         public CameraActivityMonitorService(IRulesetService rulesetService)
@@ -55,7 +55,7 @@ namespace CameraActivityMonitor.Services
 
             StopMonitoring();
 
-            var monitor = new CameraActivityMonitor(cameraId);
+            var monitor = new NativeCameraActivityMonitor(cameraId);
             monitor.UsageChanged += OnUsageChanged;
             monitor.Start();
 

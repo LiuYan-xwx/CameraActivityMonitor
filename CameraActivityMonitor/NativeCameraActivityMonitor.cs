@@ -5,7 +5,7 @@ using Windows.Win32.Media.MediaFoundation;
 
 namespace CameraActivityMonitor;
 
-public sealed class CameraActivityMonitor : IDisposable
+public sealed class NativeCameraActivityMonitor : IDisposable
 {
     private readonly string _deviceId;
     private readonly SensorActivityCallback _callback;
@@ -21,7 +21,7 @@ public sealed class CameraActivityMonitor : IDisposable
         remove => _callback.UsageChanged -= value;
     }
 
-    public CameraActivityMonitor(string deviceId)
+    public NativeCameraActivityMonitor(string deviceId)
     {
         _deviceId = deviceId;
         _callback = new SensorActivityCallback(_deviceId);
