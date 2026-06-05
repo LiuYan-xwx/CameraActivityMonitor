@@ -73,49 +73,52 @@ public sealed class CameraActivityMonitor : IDisposable
         public void OnActivitiesReport(IMFSensorActivitiesReport sensorActivitiesReport)
         {
             uint? latestPid = null;
-
-            try
-            {
-                sensorActivitiesReport.GetActivityReportByDeviceName(_deviceId, out var deviceActivityReport);
-                deviceActivityReport.GetProcessCount(out uint count);
-
-                for (uint i = 0; i < count; i++)
-                {
-                    deviceActivityReport.GetProcessActivity(i, out var processActivity);
-                    processActivity.GetStreamingState(out BOOL streaming);
-
-                    if (!streaming)
-                    {
-                        continue;
-                    }
-
-                    processActivity.GetProcessId(out uint processId);
-                    latestPid = processId;
-                    break; // 同一时间只有一个 streaming=true
-                }
-            }
-            catch (COMException ex) when ((uint)ex.HResult == 0xC00D36D5)
-            {
-                // 设备当前没有活动
-                latestPid = null;
-            }
-
-            bool inUse = latestPid.HasValue;
-            bool changed;
+            bool shouldNotify = false;
 
             lock (_gate)
             {
-                changed = (IsInUse != inUse) || _activePid != latestPid;
-                if (!changed)
+                try
+                {
+                    sensorActivitiesReport.GetActivityReportByDeviceName(_deviceId, out var deviceActivityReport);
+                    deviceActivityReport.GetProcessCount(out uint count);
+
+                    for (uint i = 0; i < count; i++)
+                    {
+                        deviceActivityReport.GetProcessActivity(i, out var processActivity);
+                        processActivity.GetStreamingState(out BOOL streaming);
+
+                        if (!streaming)
+                        {
+                            continue;
+                        }
+
+                        processActivity.GetProcessId(out uint processId);
+                        latestPid = processId;
+                        break; // 同一时间只有一个 streaming=true
+                    }
+                }
+                catch (COMException ex) when ((uint)ex.HResult == 0xC00D36D5)
+                {
+                    // 设备当前没有活动
+                    latestPid = null;
+                }
+
+                bool inUse = latestPid.HasValue;
+
+                if (IsInUse == inUse && _activePid == latestPid)
                 {
                     return;
                 }
 
                 IsInUse = inUse;
                 _activePid = latestPid;
+                shouldNotify = true;
             }
 
-            UsageChanged?.Invoke(IsInUse, _activePid);
+            if (shouldNotify)
+            {
+                UsageChanged?.Invoke(IsInUse, _activePid);
+            }
         }
     }
 }
