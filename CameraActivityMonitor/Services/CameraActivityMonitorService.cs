@@ -81,7 +81,26 @@ namespace CameraActivityMonitor.Services
         private void OnUsageChanged(bool inUse, uint? pid)
         {
             IsCameraInUse = inUse;
-            ProcessName = pid.HasValue ? Process.GetProcessById((int)pid).ProcessName : null;
+            try
+            {
+                if (pid.HasValue)
+                {
+                    using var process = Process.GetProcessById((int)pid);
+                    ProcessName = process.ProcessName;
+                }
+                else
+                {
+                    ProcessName = null;
+                }
+            }
+            catch (ArgumentException)
+            {
+                ProcessName = null;
+            }
+            catch (InvalidOperationException)
+            {
+                ProcessName = null;
+            }
             UsageChanged?.Invoke(inUse);
             Dispatcher.UIThread.Post(() => _rulesetService.NotifyStatusChanged());
         }
