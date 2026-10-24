@@ -1,4 +1,4 @@
-﻿using CameraActivityMonitor.Controls;
+using CameraActivityMonitor.Controls;
 using CameraActivityMonitor.Models;
 using CameraActivityMonitor.Services;
 using CameraActivityMonitor.ViewModels;
@@ -11,6 +11,7 @@ using ClassIsland.Shared;
 using ClassIsland.Shared.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
 using Windows.Win32;
 
 namespace CameraActivityMonitor
@@ -20,7 +21,7 @@ namespace CameraActivityMonitor
     {
         public static Settings Settings { get; set; } = new Settings();
 
-        public override async void Initialize(HostBuilderContext context, IServiceCollection services)
+        public override void Initialize(HostBuilderContext context, IServiceCollection services)
         {
             Settings = ConfigureFileHelper.LoadConfig<Settings>(Path.Combine(PluginConfigFolder, "Settings.json"));  // 加载配置文件
             Settings.PropertyChanged += (_, _) =>
@@ -31,7 +32,19 @@ namespace CameraActivityMonitor
             PInvoke.MFStartup(PInvoke.MF_VERSION, 0);
             AppBase.Current.AppStopping += (_, _) =>
             {
-                PInvoke.MFShutdown();
+                try
+                {
+                    // 必须在 MFShutdown 前停止 Media Foundation 监控并释放注册表轮询资源。
+                    IAppHost.TryGetService<ICameraActivityMonitorService>()?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"释放摄像头监控服务失败：{ex}");
+                }
+                finally
+                {
+                    PInvoke.MFShutdown();
+                }
             };
 
             services.AddSingleton<ICameraActivityMonitorService, CameraActivityMonitorService>();
@@ -45,11 +58,13 @@ namespace CameraActivityMonitor
 
         private static void StartCameraMonitoringIfNeeded()
         {
-            if (Settings.AutoStart && Settings.SelectedCamera is not null)
+            if (!Settings.AutoStart)
             {
-                var cameraActivityMonitorService = IAppHost.GetService<ICameraActivityMonitorService>();
-                cameraActivityMonitorService.StartMonitoring(Settings.SelectedCamera.Id);
+                return;
             }
+
+            var cameraActivityMonitorService = IAppHost.GetService<ICameraActivityMonitorService>();
+            cameraActivityMonitorService.StartMonitoring(Settings.SelectedCamera?.Id);
         }
     }
 }

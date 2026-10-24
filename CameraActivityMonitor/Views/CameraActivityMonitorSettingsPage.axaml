@@ -25,9 +25,15 @@
                 IconSource="{ci:FluentIconSource &#xE9E4;}"
                 IsExpanded="True">
 
-                <controls:SettingsExpanderItem Content="监控状态">
+                <controls:SettingsExpanderItem Content="Media Foundation 监控">
                     <controls:SettingsExpanderItem.Footer>
-                        <controls1:CheckOrDismiss FontSize="16" Status="{Binding IsMonitoring}" />
+                        <controls1:CheckOrDismiss FontSize="16" Status="{Binding CameraActivityMonitorService.IsMediaFoundationMonitoring}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem Content="注册表监控">
+                    <controls:SettingsExpanderItem.Footer>
+                        <controls1:CheckOrDismiss FontSize="16" Status="{Binding CameraActivityMonitorService.IsRegistryMonitoring}" />
                     </controls:SettingsExpanderItem.Footer>
                 </controls:SettingsExpanderItem>
 
@@ -42,43 +48,87 @@
                         <TextBlock VerticalAlignment="Center" Text="{Binding CameraActivityMonitorService.ProcessName}" />
                     </controls:SettingsExpanderItem.Footer>
                 </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem Content="注册表状态">
+                    <controls:SettingsExpanderItem.Footer>
+                        <TextBlock
+                            MaxWidth="420"
+                            VerticalAlignment="Center"
+                            Text="{Binding CameraActivityMonitorService.RegistryStatus}"
+                            TextWrapping="Wrap" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
             </controls:SettingsExpander>
 
             <Separator Margin="0,12,0,4" />
             <ci:IconText Glyph="&#xEF27;" Text="控制及配置" />
 
             <controls:SettingsExpander
-                Description="选择要监控的目标摄像头"
-                Header="选择摄像头"
+                Description="统一开启或关闭所有已启用监控方式的实际运行，不改变各监控方式的启用配置"
+                Header="摄像头监控总开关"
+                IconSource="{ci:FluentIconSource &#xEF27;}">
+                <controls:SettingsExpander.Footer>
+                    <StackPanel
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <ci:AnimatedIconButton
+                            Classes.fade="{Binding IsMonitoring}"
+                            Classes.foreground-accent="{Binding !IsMonitoring}"
+                            Command="{Binding StartMonitorCommand}"
+                            Glyph="&#xEDB9;"
+                            IsKeepingExpanded="{Binding !IsMonitoring}"
+                            Text="开启" />
+                        <ci:AnimatedIconButton
+                            Classes.fade="{Binding !IsMonitoring}"
+                            Classes.foreground-accent="{Binding IsMonitoring}"
+                            Command="{Binding StopMonitorCommand}"
+                            Glyph="&#xEE67;"
+                            IsKeepingExpanded="{Binding IsMonitoring}"
+                            Text="关闭" />
+                    </StackPanel>
+                </controls:SettingsExpander.Footer>
+            </controls:SettingsExpander>
+
+            <controls:SettingsExpander
+                Description="ClassIsland 启动后自动开始监控已启用的监控方式"
+                Header="自动开启监控"
+                IconSource="{ci:FluentIconSource &#xE342;}">
+                <controls:SettingsExpander.Footer>
+                    <ToggleSwitch IsChecked="{Binding Settings.AutoStart, Mode=TwoWay}" />
+                </controls:SettingsExpander.Footer>
+            </controls:SettingsExpander>
+
+            <controls:SettingsExpander
+                Description="通过 Windows Media Foundation 监听所选摄像头的占用状态（原有方式）"
+                Header="Media Foundation 监控"
                 IconSource="{ci:FluentIconSource &#xE392;}"
                 IsExpanded="True">
-                <controls:SettingsExpander.Footer>
-                    <ComboBox
-                        Width="260"
-                        ItemsSource="{Binding Cameras}"
-                        SelectedItem="{Binding SelectedCamera, Mode=TwoWay}" />
-                </controls:SettingsExpander.Footer>
+                <controls:SettingsExpanderItem Content="启用 Media Foundation 监控">
+                    <controls:SettingsExpanderItem.Footer>
+                        <ToggleSwitch IsChecked="{Binding Settings.EnableMediaFoundationMonitoring, Mode=TwoWay}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
 
-                <controls:SettingsExpanderItem Content="操作">
+                <controls:SettingsExpanderItem
+                    Content="选择摄像头"
+                    Description="选择要监控的目标摄像头。">
+                    <controls:SettingsExpanderItem.Footer>
+                        <ComboBox
+                            Width="260"
+                            ItemsSource="{Binding Cameras}"
+                            SelectedItem="{Binding SelectedCamera, Mode=TwoWay}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem
+                    Content="刷新摄像头列表"
+                    Description="重新检测/枚举当前系统存在的摄像头设备，并刷新摄像头列表。">
                     <controls:SettingsExpanderItem.Footer>
                         <StackPanel
                             VerticalAlignment="Center"
                             Orientation="Horizontal"
                             Spacing="8">
-                            <ci:AnimatedIconButton
-                                Classes.fade="{Binding IsMonitoring}"
-                                Classes.foreground-accent="{Binding !IsMonitoring}"
-                                Command="{Binding StartMonitorCommand}"
-                                Glyph="&#xEDB9;"
-                                IsKeepingExpanded="{Binding !IsMonitoring}"
-                                Text="开启" />
-                            <ci:AnimatedIconButton
-                                Classes.fade="{Binding !IsMonitoring}"
-                                Classes.foreground-accent="{Binding IsMonitoring}"
-                                Command="{Binding StopMonitorCommand}"
-                                Glyph="&#xEE67;"
-                                IsKeepingExpanded="{Binding IsMonitoring}"
-                                Text="关闭" />
                             <ci:AnimatedIconButton
                                 Classes.fade="{Binding RefreshCommand.IsRunning}"
                                 Classes.foreground-accent="{Binding !RefreshCommand.IsRunning}"
@@ -97,13 +147,63 @@
             </controls:SettingsExpander>
 
             <controls:SettingsExpander
-                Description="程序启动后自动开始监控"
-                Header="自动开启监控"
-                IconSource="{ci:FluentIconSource &#xE342;}">
-                <controls:SettingsExpander.Footer>
-                    <ToggleSwitch IsChecked="{Binding Settings.AutoStart, Mode=TwoWay}" />
-                </controls:SettingsExpander.Footer>
+                Description="读取 CapabilityAccessManager 注册表记录，适用于 Media Foundation 无法正确监听的场景"
+                Header="注册表监控"
+                IconSource="{ci:FluentIconSource &#xE71C;}"
+                IsExpanded="True">
+                <controls:SettingsExpanderItem Content="启用注册表监控">
+                    <controls:SettingsExpanderItem.Footer>
+                        <ToggleSwitch IsChecked="{Binding Settings.EnableRegistryMonitoring, Mode=TwoWay}" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem
+                    Content="注册表项路径"
+                    Description="每行填写一个路径。支持完整 HKEY_CURRENT_USER 路径，或相对于 ...\webcam 的 NonPackaged\... / Packaged\... 路径。">
+                    <controls:SettingsExpanderItem.Footer>
+                        <TextBox
+                            Width="420"
+                            MinHeight="80"
+                            MaxHeight="140"
+                            AcceptsReturn="True"
+                            IsEnabled="{Binding Settings.EnableRegistryMonitoring}"
+                            Text="{Binding Settings.RegistryKeyPathsText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            TextWrapping="Wrap"
+                            Watermark="每行一个注册表项路径" />
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
+
+                <controls:SettingsExpanderItem
+                    Content="轮询间隔"
+                    Description="读取注册表状态的间隔，单位为秒。">
+                    <controls:SettingsExpanderItem.Footer>
+                        <ci:Field Suffix="秒">
+                            <controls:NumberBox
+                                Width="150"
+                                Minimum="1"
+                                Maximum="3600"
+                                IsEnabled="{Binding Settings.EnableRegistryMonitoring}"
+                                SpinButtonPlacementMode="Inline"
+                                Value="{Binding Settings.RegistryPollingIntervalSeconds, Mode=TwoWay, Converter={x:Static ci:NotNaNConverter.Instance}}" />
+                        </ci:Field>
+                    </controls:SettingsExpanderItem.Footer>
+                </controls:SettingsExpanderItem>
             </controls:SettingsExpander>
+
+            <TextBlock
+                Margin="48,0,0,0"
+                FontSize="12"
+                Opacity="0.75"
+                Text="{Binding CameraActivityMonitorService.RegistryStatusDetails}"
+                TextWrapping="Wrap"
+                IsVisible="{Binding Settings.EnableRegistryMonitoring}" />
+
+            <TextBlock
+                Margin="48,0,0,0"
+                FontSize="12"
+                Opacity="0.75"
+                Text="任一被监控路径的 LastUsedTimeStop 为 0 时，视为摄像头正在使用。"
+                TextWrapping="Wrap" />
         </StackPanel>
     </ScrollViewer>
 </ci:SettingsPageBase>

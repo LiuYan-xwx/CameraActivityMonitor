@@ -14,18 +14,22 @@
 
 一个用于监控摄像头占用状态的 [ClassIsland](https://github.com/ClassIsland/ClassIsland) 插件。
 
-通过 Windows 的 Media Foundation 接口监听摄像头当前是否正在被其它程序使用，并把这个状态提供给 ClassIsland 的规则系统。
+通过 Windows 的 Media Foundation 接口或 CapabilityAccessManager 注册表记录监听摄像头当前是否正在被其它程序使用，并把这个状态提供给 ClassIsland 的规则系统。
 
 ## 功能
 
 - 监控指定摄像头是否正在被占用
+- 支持 Media Foundation 与注册表两种监控方式，可单独启用或同时启用
+- 注册表监控支持配置多个注册表项路径，任一被监控路径正在使用摄像头时规则即生效
+- 可设置注册表状态轮询间隔
 - 在 ClassIsland 中提供 `摄像头是否被使用` 规则
 - 支持在设置页选择要监控的摄像头设备
 - 支持跟随 ClassIsland 启动后自动开始监控
 - 支持匹配占用的进程名
 
 ## 设置截图
-<img width="2047" height="1152" alt="image" src="https://github.com/user-attachments/assets/8770f2f8-fd0e-4002-851e-7b9e91f6b264" />
+<img width="1083" height="1294" alt="CameraActivityMonitor" src="https://github.com/user-attachments/assets/85ee55ac-4caf-4858-b9f3-4ffad0de00d8" />
+
 
 ## 系统要求
 
@@ -42,7 +46,35 @@
 2. 点击“开启”开始监控，点击“关闭”停止监控。
 3. 查看当前的状态
 4. 如有需要，可以点击“刷新”重新读取摄像头列表。
-5. 打开“自动开启监控”后，ClassIsland 下次启动时会自动开始监控已选择的摄像头。
+5. 打开“自动开启监控”后，ClassIsland 下次启动时会自动开始监控已启用的监控方式。
+
+### 注册表监控
+
+如果 Media Foundation 在特定环境中无法正确判断摄像头占用状态，可以启用注册表监控：
+
+1. 打开“启用注册表监控”。
+2. 在“注册表项路径”中填写需要监控的项，每行一个。
+3. 设置轮询间隔（秒）。
+4. 点击“开启”开始监控。
+
+路径支持以下几种写法：
+
+```text
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged\<应用路径>
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged\<应用路径>
+NonPackaged\<应用路径>
+Packaged\<包名>
+```
+
+其中 `<应用路径>` 是 Windows 在注册表中使用的应用标识，例如可执行文件路径中的反斜杠会被替换为 `#`。可以通过注册表编辑器在以下位置找到目标应用对应的项：
+
+```text
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam
+```
+
+插件读取每个被监控项中的 `LastUsedTimeStop`：值为 `0` 时认为该应用正在使用摄像头，非 `0` 时认为没有使用。任意一个被监控项处于使用状态，`摄像头是否被使用` 规则就会生效。
+
+Media Foundation 和注册表监控可以同时启用，最终状态按“任一来源检测到使用”合并。注册表状态和每个路径的读取结果会显示在设置页中。
 
 ## 规则用法
 
@@ -52,9 +84,9 @@
 摄像头是否被使用
 ```
 
-当当前选中的摄像头正在被其它程序调用时，这个规则会处于生效状态。
+当 Media Foundation 监控的摄像头或任一注册表路径正在被其它程序调用时，这个规则会处于生效状态。
 
-规则支持匹配占用的进程名，需要勾选 “匹配进程名”，然后按照设置页的进程名合适填写，不区分大小写。当且仅当摄像头被占用，且占用的进程匹配所设置的，此规则才会生效。
+规则支持匹配占用的进程名，需要勾选 “匹配进程名”，然后按照设置页显示的进程名填写，不区分大小写。开启后，只有摄像头被占用，并且任一监控来源的占用进程匹配所设置的进程名时，规则才会生效。注册表来源的进程名由注册表项路径推导，通常为可执行文件名去掉 `.exe` 后的部分；打包应用的进程名为包名。
 
 
 ### 使用示例
@@ -65,9 +97,10 @@
 
 ## 注意事项
 
-* 本插件依赖 Windows 的 Media Foundation 摄像头活动监控接口，因此只支持 Windows。
+* 本插件依赖 Windows 的 Media Foundation 和注册表接口，因此只支持 Windows。
 * 插件只判断摄像头是否被占用，不会读取、保存或上传摄像头画面。
 * 如果摄像头列表为空，可以先确认系统里能否正常识别摄像头，然后回到设置页点击“刷新”。
+* 注册表路径不存在、`LastUsedTimeStop` 缺失或类型异常时，插件会在设置页显示状态并继续运行，不会导致 ClassIsland 崩溃。
 
 ## 开发与构建
 

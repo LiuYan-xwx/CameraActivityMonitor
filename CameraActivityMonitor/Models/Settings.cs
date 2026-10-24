@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CameraActivityMonitor.Models
 {
@@ -9,5 +9,18 @@ namespace CameraActivityMonitor.Models
 
         [ObservableProperty]
         private bool _autoStart = true;
+
+        [ObservableProperty]
+        private bool _enableMediaFoundationMonitoring = true;
+
+        [ObservableProperty]
+        private bool _enableRegistryMonitoring;
+
+        // 每行一个路径，便于用户直接粘贴多个 CapabilityAccessManager 项。
+        [ObservableProperty]
+        private string _registryKeyPathsText = "";
+
+        [ObservableProperty]
+        private int _registryPollingIntervalSeconds = 2;
     }
 }

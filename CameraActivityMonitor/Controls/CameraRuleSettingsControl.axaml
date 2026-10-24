@@ -16,10 +16,14 @@
         Classes="items-valign-center"
         DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CameraRuleSettingsControl}}"
         Orientation="Horizontal">
-        <CheckBox Content="匹配进程名" IsChecked="{Binding Settings.MatchProcessName, Mode=TwoWay}" />
+        <CheckBox
+            Content="匹配进程名"
+            IsChecked="{Binding Settings.MatchProcessName, Mode=TwoWay}"
+            ToolTip.Tip="同时匹配 Media Foundation 和注册表来源的占用进程名；注册表来源通常为可执行文件名（不含 .exe）。" />
         <TextBox
             MinWidth="100"
             IsVisible="{Binding Settings.MatchProcessName}"
-            Text="{Binding Settings.ProcessName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding Settings.ProcessName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ToolTip.Tip="可填写进程名或 .exe 文件名，不区分大小写。" />
     </WrapPanel>
 </ci:RuleSettingsControlBase>

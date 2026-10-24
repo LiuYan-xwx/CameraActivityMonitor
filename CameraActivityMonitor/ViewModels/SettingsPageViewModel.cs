@@ -1,4 +1,4 @@
-﻿using CameraActivityMonitor.Models;
+using CameraActivityMonitor.Models;
 using CameraActivityMonitor.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -37,12 +37,23 @@ namespace CameraActivityMonitor.ViewModels
         public SettingsPageViewModel(ICameraActivityMonitorService cameraActivityMonitorService)
         {
             CameraActivityMonitorService = cameraActivityMonitorService;
-            CameraActivityMonitorService.UsageChanged += (_) => OnPropertyChanged(nameof(IsCameraInUse));
+            CameraActivityMonitorService.UsageChanged += OnUsageChanged;
+            CameraActivityMonitorService.MonitoringStateChanged += OnMonitoringStateChanged;
 
             if (Settings.AutoStart)
             {
                 StartMonitor();
             }
+        }
+
+        private void OnUsageChanged(bool inUse)
+        {
+            OnPropertyChanged(nameof(IsCameraInUse));
+        }
+
+        private void OnMonitoringStateChanged()
+        {
+            RefreshMonitoringState();
         }
 
 
@@ -52,6 +63,7 @@ namespace CameraActivityMonitor.ViewModels
             {
                 return;
             }
+
             StartMonitor();
         }
 
@@ -77,7 +89,8 @@ namespace CameraActivityMonitor.ViewModels
                 if (Cameras.Count == 0)
                 {
                     SelectedCamera = null;
-                    CameraActivityMonitorService.StopMonitoring();
+                    CameraActivityMonitorService.StopMediaFoundationMonitoring();
+                    RefreshMonitoringState();
                     return;
                 }
 
@@ -85,23 +98,17 @@ namespace CameraActivityMonitor.ViewModels
             }
             catch
             {
-                CameraActivityMonitorService.StopMonitoring();
+                // 摄像头枚举失败时只停止 Media Foundation 监控，不能连带停止注册表监控。
+                CameraActivityMonitorService.StopMediaFoundationMonitoring();
+                RefreshMonitoringState();
             }
         }
 
         [RelayCommand(CanExecute = nameof(CanStartMonitor))]
         private void StartMonitor()
         {
-            if (SelectedCamera is null)
-            {
-                return;
-            }
-            CameraActivityMonitorService.StartMonitoring(SelectedCamera.Id);
-            OnPropertyChanged(nameof(IsMonitoring));
-            OnPropertyChanged(nameof(IsCameraInUse));
-            OnPropertyChanged(nameof(CanStartMonitor));
-            StartMonitorCommand.NotifyCanExecuteChanged();
-            StopMonitorCommand.NotifyCanExecuteChanged();
+            CameraActivityMonitorService.StartMonitoring(SelectedCamera?.Id);
+            RefreshMonitoringState();
         }
 
         [RelayCommand(CanExecute = nameof(IsMonitoring))]
@@ -111,7 +118,13 @@ namespace CameraActivityMonitor.ViewModels
             {
                 return;
             }
+
             CameraActivityMonitorService.StopMonitoring();
+            RefreshMonitoringState();
+        }
+
+        private void RefreshMonitoringState()
+        {
             OnPropertyChanged(nameof(IsMonitoring));
             OnPropertyChanged(nameof(IsCameraInUse));
             OnPropertyChanged(nameof(CanStartMonitor));
