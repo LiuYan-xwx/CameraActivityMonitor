@@ -1,0 +1,25 @@
+<ci:TriggerSettingsControlBase
+    x:Class="CameraActivityMonitor.Controls.CameraUsageTriggerSettingsControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ci="http://classisland.tech/schemas/xaml/core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:CameraActivityMonitor.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="clr-namespace:CameraActivityMonitor.Models"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:TypeArguments="settings:CameraUsageChangedTriggerSettings"
+    mc:Ignorable="d">
+    <WrapPanel
+        Classes="items-valign-center"
+        DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CameraUsageTriggerSettingsControl}}"
+        Orientation="Horizontal">
+        <TextBlock Margin="0 0 8 0" VerticalAlignment="Center" Text="触发时机" />
+        <ComboBox MinWidth="140" SelectedIndex="{Binding Settings.Mode, Mode=TwoWay}">
+            <ComboBoxItem Content="任意变化" />
+            <ComboBoxItem Content="摄像头被占用时" />
+            <ComboBoxItem Content="摄像头变为空闲时" />
+        </ComboBox>
+    </WrapPanel>
+</ci:TriggerSettingsControlBase>
